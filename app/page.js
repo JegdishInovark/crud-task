@@ -121,7 +121,9 @@ export default function Home() {
         <h1>CRUD Task</h1>
         <form onSubmit={handleSubmit}>
           <div className="form-field">
-            <label>Name</label>
+            <label>
+              Name <span className="important">*</span>
+            </label>
             <input
               type="text"
               name="name"
@@ -131,7 +133,9 @@ export default function Home() {
             />
           </div>
           <div className="form-field">
-            <label>Email</label>
+            <label>
+              Email <span className="important">*</span>
+            </label>
             <input
               type="email"
               name="email"
@@ -141,7 +145,9 @@ export default function Home() {
             />
           </div>
           <div className="form-field">
-            <label>LinkedIn URL</label>
+            <label>
+              LinkedIn URL <span className="important">*</span>
+            </label>
             <input
               type="url"
               name="linkedin"
@@ -151,14 +157,16 @@ export default function Home() {
             />
           </div>
           <div className="form-field">
-            <label>Gender</label>
+            <label>
+              Gender <span className="important">*</span>
+            </label>
             <select
               name="gender"
               value={formData.gender}
               onChange={handleInputChange}
               required
             >
-              <option value="">Select</option>
+              <option value="">Select </option>
               <option value="male">Male</option>
               <option value="female">Female</option>
             </select>
@@ -183,7 +191,7 @@ export default function Home() {
             />
           </div>
           <div className="form-field">
-            <label>State</label>
+            <label>State </label>
             <select
               name="state"
               value={formData.state}
@@ -199,7 +207,7 @@ export default function Home() {
             </select>
           </div>
           <div className="form-field">
-            <label>City</label>
+            <label>City </label>
             <select
               name="city"
               value={formData.city}
@@ -217,7 +225,9 @@ export default function Home() {
             </select>
           </div>
           <div className="form-field">
-            <label>PIN</label>
+            <label>
+              PIN <span className="important">*</span>
+            </label>
             <input
               type="number"
               name="pin"
