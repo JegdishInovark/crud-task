@@ -1,101 +1,300 @@
-import Image from "next/image";
+"use client";
+import React, { useState } from "react";
+import masterdata from "@/staticJSON/masterdata.json";
+import { formConfig } from "@/config/formConfig";
+import "./home.scss";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.js
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [users, setUsers] = useState([]);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    linkedin: "",
+    gender: "",
+    addressLine1: "",
+    addressLine2: "",
+    state: "",
+    city: "",
+    pin: "",
+  });
+  const [expandedRow, setExpandedRow] = useState(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleStateChange = (e) => {
+    const { value } = e.target;
+    setFormData((prev) => ({ ...prev, state: value, city: "" }));
+  };
+
+  const validateForm = () => {
+    const { name, email, linkedin, gender, addressLine1, state, city, pin } =
+      formData;
+
+    if (
+      !name ||
+      name.length < formConfig.validations.name.minLength ||
+      name.length > formConfig.validations.name.maxLength
+    ) {
+      alert(
+        `Name must be between ${formConfig.validations.name.minLength} and ${formConfig.validations.name.maxLength} characters.`
+      );
+      return false;
+    }
+    if (!email || !formConfig.validations.email.pattern.test(email)) {
+      alert("Please enter a valid email address.");
+      return false;
+    }
+    if (!linkedin || !formConfig.validations.linkedin.pattern.test(linkedin)) {
+      alert("Please enter a valid LinkedIn URL.");
+      return false;
+    }
+    if (!gender) {
+      alert("Gender is mandatory.");
+      return false;
+    }
+    if (!addressLine1) {
+      alert("Address Line 1 is mandatory.");
+      return false;
+    }
+    if (!state || !city) {
+      alert("State and City are mandatory.");
+      return false;
+    }
+    if (!pin || !formConfig.validations.pin.pattern.test(pin)) {
+      alert("PIN should be a 6-digit number.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      if (selectedUser) {
+        setUsers((prev) =>
+          prev.map((user) =>
+            user.email === selectedUser.email ? formData : user
+          )
+        );
+      } else {
+        setUsers((prev) => [...prev, formData]);
+      }
+      resetForm();
+    }
+  };
+
+  const handleDeleteUser = (userToDelete) => {
+    if (window.confirm("Are you sure you want to delete this user?")) {
+      setUsers((prev) =>
+        prev.filter((user) => user.email !== userToDelete.email)
+      );
+      resetForm();
+    }
+  };
+
+  const resetForm = () => {
+    setSelectedUser(null);
+    setFormData({
+      name: "",
+      email: "",
+      linkedin: "",
+      gender: "",
+      addressLine1: "",
+      addressLine2: "",
+      state: "",
+      city: "",
+      pin: "",
+    });
+  };
+
+  const toggleExpand = (index) => {
+    setExpandedRow(expandedRow === index ? null : index);
+  };
+
+  return (
+    <div className="home-wrapper">
+      <div className="form">
+        <h1>CRUD Task</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="form-field">
+            <label>Name</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              required
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          </div>
+          <div className="form-field">
+            <label>Email</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-field">
+            <label>LinkedIn URL</label>
+            <input
+              type="url"
+              name="linkedin"
+              value={formData.linkedin}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-field">
+            <label>Gender</label>
+            <select
+              name="gender"
+              value={formData.gender}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+          <div className="form-field">
+            <label>Address Line 1</label>
+            <input
+              type="text"
+              name="addressLine1"
+              value={formData.addressLine1}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div className="form-field">
+            <label>Address Line 2</label>
+            <input
+              type="text"
+              name="addressLine2"
+              value={formData.addressLine2}
+              onChange={handleInputChange}
+            />
+          </div>
+          <div className="form-field">
+            <label>State</label>
+            <select
+              name="state"
+              value={formData.state}
+              onChange={handleStateChange}
+              required
+            >
+              <option value="">Select</option>
+              {masterdata.states.map((state) => (
+                <option key={state.name} value={state.name}>
+                  {state.name}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="form-field">
+            <label>City</label>
+            <select
+              name="city"
+              value={formData.city}
+              onChange={handleInputChange}
+              required
+            >
+              <option value="">Select</option>
+              {masterdata.states
+                .find((s) => s.name === formData.state)
+                ?.cities.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+            </select>
+          </div>
+          <div className="form-field">
+            <label>PIN</label>
+            <input
+              type="number"
+              name="pin"
+              value={formData.pin}
+              onChange={handleInputChange}
+              required
+            />
+          </div>
+          <div>
+            {" "}
+            <button type="submit" className="adduser_btn">
+              {selectedUser ? "Edit User" : "Add User"}
+            </button>
+          </div>
+        </form>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>LinkedIn</th>
+              <th>Gender</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {users.map((user, index) => (
+              <React.Fragment key={user.email}>
+                <tr>
+                  <td>{user.name}</td>
+                  <td>{user.email}</td>
+                  <td>{user.linkedin}</td>
+                  <td>{user.gender}</td>
+                  <td>
+                    <div className="table_btn">
+                      <button
+                        onClick={() => {
+                          setSelectedUser(user);
+                          setFormData(user);
+                        }}
+                      >
+                        Edit
+                      </button>
+                    </div>
+                    <div className="table_btn">
+                      <button onClick={() => handleDeleteUser(user)}>
+                        Delete
+                      </button>
+                    </div>
+                    <div className="table_btn">
+                      <button onClick={() => toggleExpand(index)}>
+                        {expandedRow === index ? "Hide" : "Show"} Address
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {expandedRow === index && (
+                  <tr>
+                    <td colSpan="5">
+                      {user.addressLine1}
+                      <br />
+                      {user.addressLine2 && (
+                        <span>
+                          {user.addressLine2}
+                          <br />
+                        </span>
+                      )}
+                      {user.city}, {user.state} - {user.pin}
+                    </td>
+                  </tr>
+                )}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
